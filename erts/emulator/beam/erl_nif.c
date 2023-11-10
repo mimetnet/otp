@@ -3178,10 +3178,16 @@ void* enif_dlopen(const char* lib,
     ErtsSysDdllError errdesc = ERTS_SYS_DDLL_ERROR_INIT;
     void* handle;
     void* init_func;
+
+	fprintf(stderr, "enif_dlopen: %s\n", lib);
+
     if (erts_sys_ddll_open(lib, &handle, &errdesc) == ERL_DE_NO_ERROR) {
 	if (erts_sys_ddll_load_nif_init(handle, &init_func, &errdesc) == ERL_DE_NO_ERROR) {
+        fprintf(stderr, "enif_dlopen: %s call nif_init\n", lib);
 	    erts_sys_ddll_call_nif_init(init_func);
-	}
+	} else {
+        fprintf(stderr, "enif_dlopen: %s failed\n", lib);
+    }
     }
     else {
 	if (err_handler != NULL) {
