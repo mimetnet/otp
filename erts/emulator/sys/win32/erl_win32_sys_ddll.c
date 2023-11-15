@@ -91,12 +91,14 @@ int erts_sys_ddll_open(const char *full_name, void **handle, ErtsSysDdllError* e
 						   ERTS_ALC_T_TMP, &used, EXT_LEN);
     wcscpy(&wcp[used/2 - 1], FILE_EXT_WCHAR);
 
+    erts_fprintf(stdout, "erts_sys_ddll_open: '%ls'\n", wcp);
+
     /* LOAD_WITH_ALTERED_SEARCH_PATH adds the specified DLL's directory to the
      * dependency search path. This also removes the directory we started in,
      * but we've explicitly added that in erl_sys_ddll_init. */
     if ((hinstance = LoadLibraryExW(wcp, NULL, LOAD_WITH_ALTERED_SEARCH_PATH)) == NULL) {
 	code = ERL_DE_DYNAMIC_ERROR_OFFSET - GetLastError();
-    erts_fprintf(stdout, "erts_sys_ddll_open: %s (%d / %d)\n", full_name, GetLastError(), code);
+    erts_fprintf(stdout, "erts_sys_ddll_open: '%ls' (%d / %d)\n", wcp, GetLastError(), code);
 	if (err != NULL) {
 	    err->str = erts_sys_ddll_error(code);
 	}
