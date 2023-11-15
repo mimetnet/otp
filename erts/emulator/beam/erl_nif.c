@@ -4685,21 +4685,24 @@ Eterm erts_load_nif(Process *c_p, ErtsCodePtr I, Eterm filename, Eterm args)
 	const char slogan[] = "Failed to load NIF library";
 	if (strstr(errdesc.str, lib_name) != NULL) {
 	    ret = load_nif_error(c_p, "load_failed", "%s: '%s'", slogan, errdesc.str);
+        erts_fprintf(stdout, "load_failed/1\n");
 	}
 	else {
 	    ret = load_nif_error(c_p, "load_failed", "%s %s: '%s'", slogan, lib_name, errdesc.str);
+        erts_fprintf(stdout, "load_failed/2\n");
 	}
     }
     else if (!is_static &&
 	     erts_sys_ddll_load_nif_init(handle, &init_func, &errdesc) != ERL_DE_NO_ERROR) {
 	ret  = load_nif_error(c_p, bad_lib, "Failed to find library init"
 			      " function: '%s'", errdesc.str);
-	
+        erts_fprintf(stdout, "library_init failed: %s\n", errdesc.str);
     }
     else if (!is_static &&
              (erts_add_taint(mod_atom),
               (entry = erts_sys_ddll_call_nif_init(init_func)) == NULL)) {
 	ret = load_nif_error(c_p, bad_lib, "Library init-call unsuccessful");
+        erts_fprintf(stdout, "library init-call unsuccessful\n");
     }
     else if (entry->major > ERL_NIF_MAJOR_VERSION
              || (entry->major == ERL_NIF_MAJOR_VERSION
@@ -4721,12 +4724,16 @@ Eterm erts_load_nif(Process *c_p, ErtsCodePtr I, Eterm filename, Eterm args)
 	ret = load_nif_error(c_p, bad_lib, "Library (%s) not compiled for "
 			     "this vm variant (%s).",
 			     entry->vm_variant, ERL_NIF_VM_VARIANT);
+        erts_fprintf(stdout, "library not compiled for VM variant\n");
     }
     else if (!erts_is_atom_str((char*)entry->name, mod_atom, 1)) {
 	ret = load_nif_error(c_p, bad_lib, "Library module name '%s' does not"
 			     " match calling module '%T'", entry->name, mod_atom);
+        erts_fprintf(stdout, "library module name mismatch\n");
     }
     else {
+        erts_fprintf(stdout, "create_lib\n");
+
         lib = create_lib(entry);
         entry = &lib->entry; /* Use a guaranteed modern lib entry from now on */
 
@@ -4849,6 +4856,8 @@ Eterm erts_load_nif(Process *c_p, ErtsCodePtr I, Eterm filename, Eterm args)
     }
     ASSERT(lib);
     ASSERT(lib->finish->nstubs_hashed == lib->entry.num_of_funcs);
+
+    erts_fprintf(stdout, "create_lib: load or upgrade\n");
 
     /* Call load or upgrade:
      */
