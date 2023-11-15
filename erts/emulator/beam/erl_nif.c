@@ -4732,8 +4732,6 @@ Eterm erts_load_nif(Process *c_p, ErtsCodePtr I, Eterm filename, Eterm args)
         erts_fprintf(stdout, "library module name mismatch\n");
     }
     else {
-        erts_fprintf(stdout, "create_lib\n");
-
         lib = create_lib(entry);
         entry = &lib->entry; /* Use a guaranteed modern lib entry from now on */
 
@@ -4857,8 +4855,6 @@ Eterm erts_load_nif(Process *c_p, ErtsCodePtr I, Eterm filename, Eterm args)
     ASSERT(lib);
     ASSERT(lib->finish->nstubs_hashed == lib->entry.num_of_funcs);
 
-    erts_fprintf(stdout, "create_lib: load or upgrade\n");
-
     /* Call load or upgrade:
      */
     env.mod_nif = lib;
@@ -4928,7 +4924,9 @@ Eterm erts_load_nif(Process *c_p, ErtsCodePtr I, Eterm filename, Eterm args)
         erts_schedule_code_barrier(&lib->barrier, load_nif_1st_finisher, lib);
     }
     else {
+    erts_fprintf(stdout, "create_lib: error (before :error)\n");
     error:
+    erts_fprintf(stdout, "create_lib: error (inside :error)\n");
 	rollback_opened_resource_types();
 	ASSERT(ret != am_ok);
         if (lib != NULL) {
