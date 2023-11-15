@@ -79,7 +79,7 @@ int erts_sys_ddll_open(const char *full_name, void **handle, ErtsSysDdllError* e
     
     if ((len = sys_strlen(full_name)) >= MAXPATHLEN - EXT_LEN) {
 	if (err != NULL) {
-	    err->str = "Library name too long";
+	    err->str = "Library name toooo long";
 	}
 	return ERL_DE_LOAD_ERROR_NAME_TO_LONG;
     }
