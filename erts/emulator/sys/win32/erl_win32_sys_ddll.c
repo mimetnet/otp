@@ -76,6 +76,8 @@ int erts_sys_ddll_open(const char *full_name, void **handle, ErtsSysDdllError* e
     wchar_t* wcp;
     Sint used;
     int code;
+
+    erts_fprintf(stdout, "erts_sys_ddll_open: %s\n", full_name);
     
     if ((len = sys_strlen(full_name)) >= MAXPATHLEN - EXT_LEN) {
 	if (err != NULL) {
@@ -94,6 +96,7 @@ int erts_sys_ddll_open(const char *full_name, void **handle, ErtsSysDdllError* e
      * but we've explicitly added that in erl_sys_ddll_init. */
     if ((hinstance = LoadLibraryExW(wcp, NULL, LOAD_WITH_ALTERED_SEARCH_PATH)) == NULL) {
 	code = ERL_DE_DYNAMIC_ERROR_OFFSET - GetLastError();
+    erts_fprintf(stdout, "erts_sys_ddll_open: %s (%d / %d)\n", full_name, GetLastError(), code);
 	if (err != NULL) {
 	    err->str = erts_sys_ddll_error(code);
 	}
@@ -102,6 +105,7 @@ int erts_sys_ddll_open(const char *full_name, void **handle, ErtsSysDdllError* e
         code = ERL_DE_NO_ERROR;
 	*handle = (void *) hinstance;
     }
+    erts_fprintf(stdout, "erts_sys_ddll_open: done\n");
     erts_free(ERTS_ALC_T_TMP, wcp);
     return code;
 }
