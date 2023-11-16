@@ -119,8 +119,9 @@ int erts_sys_ddll_open(const char *full_name, void **handle, ErtsSysDdllError* e
      * dependency search path. This also removes the directory we started in,
      * but we've explicitly added that in erl_sys_ddll_init. */
     if ((hinstance = LoadLibraryExW(wcp, NULL, LOAD_WITH_ALTERED_SEARCH_PATH)) == NULL) {
-	code = ERL_DE_DYNAMIC_ERROR_OFFSET - GetLastError();
-    erts_fprintf(stdout, "erts_sys_ddll_open: '%S' (%d / %d)\n", wcp, GetLastError(), code);
+        DWORD last_error = GetLastError();
+	code = ERL_DE_DYNAMIC_ERROR_OFFSET - last_error;
+    erts_fprintf(stdout, "erts_sys_ddll_open: '%s' (%d / %d)\n", acp, last_error, code);
 	if (err != NULL) {
 	    err->str = erts_sys_ddll_error(code);
 	}
