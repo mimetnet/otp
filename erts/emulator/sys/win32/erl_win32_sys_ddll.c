@@ -71,8 +71,8 @@ mtu(const wchar_t *input, char *output)
 	int len = 0;
 	
 	if (input) {
-		len = WideCharToMultiByte(CP_ACP, 0, input, -1, NULL, 0);
-		WideCharToMultiByte(CP_ACP, 0, input, -1, output, len);
+		len = WideCharToMultiByte(CP_UTF8, 0, input, -1, NULL, 0, NULL, NULL);
+		WideCharToMultiByte(CP_UTF8, 0, input, -1, output, len, NULL, NULL);
 	} else {
 		output[0] = '\0';
 		output[1] = '\0';
