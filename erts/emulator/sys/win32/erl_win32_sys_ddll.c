@@ -65,6 +65,23 @@ void erl_sys_ddll_init(void) {
     return;
 }
 
+static inline char *
+mtu(const wchar_t *input, char *output)
+{
+	int len = 0;
+	
+	if (input) {
+		len = WideCharToMultiByte(CP_ACP, 0, input, -1, NULL, 0);
+		WideCharToMultiByte(CP_ACP, 0, input, -1, output, len);
+	} else {
+		output[0] = '\0';
+		output[1] = '\0';
+	}
+
+	return output;
+}
+
+
 /* 
  * Open a shared object
  * Expecting 'full_name' as an UTF-8 string.
@@ -76,6 +93,7 @@ int erts_sys_ddll_open(const char *full_name, void **handle, ErtsSysDdllError* e
     wchar_t* wcp;
     Sint used;
     int code;
+    char acp[2048] = {0,};
 
     erts_fprintf(stdout, "erts_sys_ddll_open: %s\n", full_name);
     
@@ -91,7 +109,11 @@ int erts_sys_ddll_open(const char *full_name, void **handle, ErtsSysDdllError* e
 						   ERTS_ALC_T_TMP, &used, EXT_LEN);
     wcscpy(&wcp[used/2 - 1], FILE_EXT_WCHAR);
 
-    erts_fprintf(stdout, "erts_sys_ddll_open: '%S'\n", wcp);
+    if (mtu(wcp, acp)) {
+        erts_fprintf(stdout, "erts_sys_ddll_open: '%s'\n", acp);
+    } else {
+        erts_fprintf(stdout, "erts_sys_ddll_open: '<failed to convert name>'\n");
+    }
 
     /* LOAD_WITH_ALTERED_SEARCH_PATH adds the specified DLL's directory to the
      * dependency search path. This also removes the directory we started in,
